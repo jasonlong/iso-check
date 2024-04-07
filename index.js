@@ -9,6 +9,18 @@ Sentry.init({
   tracesSampleRate: 1.0, //  Capture 100% of the transactions
   profilesSampleRate: 1.0
 })
+
+const validateNumberIsPositive = (number) => {
+  try {
+    const value = parseInt(number.replaceAll(',', ''))
+    if (value <= 0) {
+      throw new Error('Number is negative or zero')
+    }
+  } catch (e) {
+    Sentry.captureException(e)
+  }
+}
+
 ;(async () => {
   const pathToExtension = path.join(process.cwd(), 'extension')
 
@@ -18,22 +30,23 @@ Sentry.init({
   })
 
   const page = await browser.newPage()
+  page.setDefaultTimeout(3000)
 
   await page.goto('https://github.com/jasonlong')
+  await page.setViewport({ width: 1280, height: 1024 })
 
-  await page.setViewport({ width: 1080, height: 1024 })
+  // Click the 3D toggle switch
+  await page.waitForSelector('[data-ic-option="cubes"]', { visible: true })
+  await page.click('[data-ic-option="cubes"]')
 
-  const textSelector = await page.waitForSelector('.js-yearly-contributions h2')
-  const fullTitle = await textSelector?.evaluate((el) => el.textContent)
+  // Contributions section
+  const contribTotal = await page.$eval(
+    '.ic-contributions-wrapper ::-p-text(Contributions) + div ::-p-text(Total)',
+    (el) => el.previousElementSibling.textContent
+  )
+  validateNumberIsPositive(contribTotal.toString())
 
-  const threeDButtonSelector = '[data-ic-option="cubes"]'
-  await page.click(threeDButtonSelector)
-
-  const contributionsHeaderSelector = await page.waitForSelector('.ic-contributions-wrapper h5')
-  const contributionsHeaderTitle = await contributionsHeaderSelector?.evaluate((el) => el.textContent)
-
-  // Print the full title
-  console.log('The contribution heading is "%s".', contributionsHeaderTitle)
+  console.log('The contribution heading is "%s".', contribTotal.toString())
 
   await browser.close()
 })()
