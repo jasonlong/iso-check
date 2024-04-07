@@ -1,6 +1,7 @@
 {
   "type": "module",
   "dependencies": {
+    "@netlify/functions": "^2.6.0",
     "@sentry/node": "^7.109.0",
     "@sentry/profiling-node": "^7.109.0",
     "puppeteer": "^22.6.3",
