@@ -1,7 +1,9 @@
-import puppeteer from 'puppeteer'
+import puppeteer from 'puppeteer-core'
+import { executablePath } from 'puppeteer'
 import path from 'path'
 import * as Sentry from '@sentry/node'
 import { nodeProfilingIntegration } from '@sentry/profiling-node'
+import chromium from '@sparticuz/chromium-min'
 
 export default async () => {
   Sentry.init({
@@ -25,13 +27,38 @@ export default async () => {
   ;(async () => {
     const pathToExtension = path.join(process.cwd(), 'extension')
 
-    const browser = await puppeteer.launch({
-      headless: 'new',
-      args: [`--disable-extensions-except=${pathToExtension}`, `--load-extension=${pathToExtension}`]
-    })
+    const browser = await puppeteer.launch(
+      process.env.NODE_ENV === 'production'
+        ? {
+            args: [
+              ...chromium.args,
+              '--hide-scrollbars',
+              '--disable-web-security',
+              `--disable-extensions-except=${pathToExtension}`,
+              `--load-extension=${pathToExtension}`
+            ],
+            defaultViewport: chromium.defaultViewport,
+            executablePath: await chromium.executablePath(
+              `https://github.com/Sparticuz/chromium/releases/download/v123.0.1/chromium-v123.0.1-pack.tar`
+            ),
+            headless: chromium.headless,
+            ignoreHTTPSErrors: true
+          }
+        : {
+            args: [
+              ...chromium.args,
+              '--hide-scrollbars',
+              '--disable-web-security',
+              `--disable-extensions-except=${pathToExtension}`,
+              `--load-extension=${pathToExtension}`
+            ],
+            headless: false,
+            executablePath: executablePath()
+          }
+    )
 
     const page = await browser.newPage()
-    page.setDefaultTimeout(3000)
+    // page.setDefaultTimeout(3000)
 
     await page.goto('https://github.com/jasonlong')
     await page.setViewport({ width: 1280, height: 1024 })
