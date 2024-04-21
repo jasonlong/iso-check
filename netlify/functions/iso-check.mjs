@@ -82,6 +82,6 @@ export default async () => {
   return
 }
 
-export const config = {
-  schedule: '@hourly'
-}
+// export const config = {
+//   schedule: '@hourly'
+// }
