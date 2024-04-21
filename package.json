@@ -1,7 +1,8 @@
 {
   "dependencies": {
     "@sparticuz/chromium-min": "^123.0.1",
-    "puppeteer-core": "^10.1.0"
+    "puppeteer-core": "^10.1.0",
+    "waait": "^1.0.5"
   },
   "name": "iso-check",
   "version": "1.0.0",
