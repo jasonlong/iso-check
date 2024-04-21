@@ -3,7 +3,7 @@ import path from 'path'
 // import * as Sentry from '@sentry/node'
 // import { nodeProfilingIntegration } from '@sentry/profiling-node'
 // import chromium from '@sparticuz/chromium-min'
-const chromium = require('@sparticuz/chromium')
+const chromium = require('@sparticuz/chromium-min')
 const puppeteer = require('puppeteer-core')
 
 export default async () => {
