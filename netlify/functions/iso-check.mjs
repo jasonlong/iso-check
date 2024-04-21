@@ -74,9 +74,12 @@ export default async () => {
     )
     validateNumberIsPositive(contribTotal.toString())
 
-    console.log('The contribution total is "%s".', contribTotal.toString())
-
     await browser.close()
+
+    return {
+      statusCode: 200,
+      body: JSON.stringify({ contribTotal })
+    }
   })()
 
   return
